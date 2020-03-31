@@ -1,1 +1,222 @@
-test
+,test,Territory/Area  †,confirmed ‡  cases,confirmed new cases,deaths,new deaths,classification§,reported case,date
+3,,China,82447,106,3310,4,Local transmission,0,31/03/2020
+4,,Republic of Korea,9661,78,158,6,Local transmission,0,31/03/2020
+5,,Australia,3966,0,16,0,Local transmission,1,31/03/2020
+6,,Malaysia,2470,150,34,7,Local transmission,0,31/03/2020
+7,,Japan,1866,173,54,2,Local transmission,0,31/03/2020
+8,,Philippines,1418,343,71,3,Local transmission,0,31/03/2020
+9,,Singapore,844,42,3,1,Local transmission,0,31/03/2020
+10,,New Zealand,552,76,1,0,Local transmission,0,31/03/2020
+11,,Viet Nam,188,9,0,0,Local transmission,0,31/03/2020
+12,,Brunei Darussalam,126,6,1,0,Local transmission,0,31/03/2020
+13,,Cambodia,103,1,0,0,Local transmission,0,31/03/2020
+14,,Mongolia,12,0,0,0,Imported cases only,2,31/03/2020
+15,,Lao People's,,,,,,,31/03/2020
+16,,Democratic Republic,8,2,0,0,Local transmission,0,31/03/2020
+17,,Fiji,5,0,0,0,Local transmission,4,31/03/2020
+18,,Papua New Guinea,1,0,0,0,Imported cases only,9,31/03/2020
+19,,Territories**,,,,,,,31/03/2020
+20,,Guam,56,0,1,0,Local transmission,1,31/03/2020
+21,,French Polynesia,35,1,0,0,Local transmission,0,31/03/2020
+22,,New Caledonia,15,0,0,0,Local transmission,2,31/03/2020
+23,,Northern Mariana,,,,,,,31/03/2020
+24,,Islands,,,,,,,31/03/2020
+25,,(Commonwealth of,,,,,,,31/03/2020
+26,,the),2,0,0,0,Under investigation,1,31/03/2020
+27,,European Region,,,,,,,31/03/2020
+28,,Italy,97689,5217,10781,758,Local transmission,0,31/03/2020
+29,,Spain,78797,6549,6528,838,Local transmission,0,31/03/2020
+30,,Germany,57298,4751,455,66,Local transmission,0,31/03/2020
+31,,France,39642,2497,2602,291,Local transmission,0,31/03/2020
+32,,The United Kingdom,19526,2433,1228,209,Local transmission,0,31/03/2020
+33,,Switzerland,14274,1122,257,22,Local transmission,0,31/03/2020
+34,,Netherlands,10866,1104,771,132,Local transmission,0,31/03/2020
+35,,Belgium,10836,1702,431,78,Local transmission,0,31/03/2020
+36,,Turkey,9271,1869,131,23,Local transmission,0,31/03/2020
+37,,Austria,8813,522,86,18,Local transmission,0,31/03/2020
+38,,Portugal,5962,792,119,19,Local transmission,0,31/03/2020
+39,,Israel,4247,382,15,0,Local transmission,0,31/03/2020
+40,,Norway,4102,257,22,2,Local transmission,0,31/03/2020
+41,,Sweden,3700,253,110,8,Local transmission,0,31/03/2020
+42,,Czechia,2829,166,16,5,Local transmission,0,31/03/2020
+43,,Ireland,2615,200,46,10,Local transmission,0,31/03/2020
+44,,Denmark,2395,194,72,7,Local transmission,0,31/03/2020
+45,,Luxembourg,1950,119,21,3,Local transmission,0,31/03/2020
+46,,Poland,1862,224,22,4,Local transmission,0,31/03/2020
+0,,Russian Federation,1534,0.0,10.0,2.0,Local transmission,1.0,31/03/2020
+1,,Finland,1218,0.0,11.0,2.0,Local transmission,1.0,31/03/2020
+2,,Greece,1156,95.0,38.0,6.0,Local transmission,0.0,31/03/2020
+3,,Iceland,1020,57.0,2.0,0.0,Local transmission,0.0,31/03/2020
+4,,Serbia,741,82.0,13.0,3.0,Local transmission,0.0,31/03/2020
+5,,Slovenia,730,39.0,11.0,2.0,Local transmission,0.0,31/03/2020
+6,,Croatia,713,56.0,6.0,1.0,Local transmission,0.0,31/03/2020
+7,,Estonia,679,39.0,3.0,2.0,Local transmission,0.0,31/03/2020
+8,,Lithuania,484,90.0,7.0,0.0,Local transmission,0.0,31/03/2020
+9,,Armenia,482,58.0,3.0,0.0,Local transmission,0.0,31/03/2020
+10,,Ukraine,480,62.0,11.0,2.0,Local transmission,0.0,31/03/2020
+11,,Hungary,447,39.0,15.0,2.0,Local transmission,0.0,31/03/2020
+12,,Latvia,376,71.0,0.0,0.0,Local transmission,0.0,31/03/2020
+13,,Bulgaria,346,15.0,8.0,1.0,Local transmission,0.0,31/03/2020
+14,,Andorra,341,20.0,6.0,2.0,Local transmission,0.0,31/03/2020
+15,,Slovakia,336,41.0,0.0,0.0,Local transmission,0.0,31/03/2020
+16,,"Bosnia andHerzegovina",325,56.0,6.0,0.0,Local transmission,0.0,31/03/2020
+17,,Kazakhstan,294,29.0,1.0,0.0,Under investigation,0.0,31/03/2020
+18,,Republic of Moldova,263,32.0,2.0,0.0,Local transmission,0.0,31/03/2020
+19,,North Macedonia,259,18.0,6.0,2.0,Local transmission,0.0,31/03/2020
+20,,San Marino,229,1.0,24.0,2.0,Local transmission,0.0,31/03/2020
+21,,Albania,223,11.0,10.0,0.0,Local transmission,0.0,31/03/2020
+22,,Cyprus,214,35.0,6.0,1.0,Local transmission,0.0,31/03/2020
+23,,Azerbaijan,190,26.0,4.0,0.0,Local transmission,0.0,31/03/2020
+24,,Malta,151,12.0,0.0,0.0,Local transmission,0.0,31/03/2020
+25,,Uzbekistan,145,12.0,2.0,0.0,Local transmission,0.0,31/03/2020
+26,,Georgia,98,8.0,0.0,0.0,Local transmission,0.0,31/03/2020
+27,,Belarus,94,0.0,0.0,0.0,Local transmission,2.0,31/03/2020
+28,,Montenegro,85,3.0,1.0,0.0,Local transmission,0.0,31/03/2020
+29,,Kyrgyzstan,84,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+30,,Liechtenstein,62,1.0,0.0,0.0,Under investigation,0.0,31/03/2020
+31,,Monaco,46,27.0,0.0,0.0,Local transmission,0.0,31/03/2020
+32,,Holy See,6,2.0,0.0,0.0,Under investigation,0.0,31/03/2020
+33,,,Territories**,,,,,,31/03/2020
+34,,Faroe Islands,159,4.0,0.0,0.0,Local transmission,0.0,31/03/2020
+35,,Kosovo[1],94,3.0,1.0,0.0,Local transmission,0.0,31/03/2020
+36,,Gibraltar,65,9.0,0.0,0.0,Local transmission,0.0,31/03/2020
+37,,Jersey,63,2.0,2.0,1.0,Local transmission,0.0,31/03/2020
+38,,Isle of Man,42,10.0,0.0,0.0,Local transmission,0.0,31/03/2020
+39,,Guernsey,39,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+40,,Greenland,10,0.0,0.0,0.0,Under investigation,1.0,31/03/2020
+41,,,South-East Asia Region,,,,,,31/03/2020
+42,,Thailand,1524,136.0,9.0,2.0,Local transmission,0.0,31/03/2020
+43,,Indonesia,1285,130.0,114.0,12.0,Local transmission,0.0,31/03/2020
+44,,India,1071,92.0,29.0,4.0,Local transmission,0.0,31/03/2020
+45,,Sri Lanka,120,14.0,1.0,1.0,Local transmission,0.0,31/03/2020
+46,,Bangladesh,49,1.0,5.0,0.0,Local transmission,0.0,31/03/2020
+47,,Maldives,17,1.0,0.0,0.0,Local transmission,0.0,31/03/2020
+48,,Myanmar,8,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+49,,Nepal,5,0.0,0.0,0.0,Imported cases only,1.0,31/03/2020
+50,,Bhutan,4,1.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+51,,Timor-Leste,1,0.0,0.0,0.0,Under investigation,9.0,31/03/2020
+0,,"Iran (Islamic Republicof)",38309,2901.0,2640.0,123.0,Local transmission,0.0,31/03/2020
+1,,Pakistan,1625,99.0,18.0,5.0,Local transmission,0.0,31/03/2020
+2,,Saudi Arabia,1299,96.0,8.0,4.0,Local transmission,0.0,31/03/2020
+3,,Qatar,634,44.0,2.0,1.0,Local transmission,0.0,31/03/2020
+4,,Egypt,609,33.0,40.0,4.0,Local transmission,0.0,31/03/2020
+5,,United Arab Emirates,570,102.0,3.0,1.0,Local transmission,0.0,31/03/2020
+6,,Iraq,547,41.0,42.0,0.0,Local transmission,0.0,31/03/2020
+7,,Morocco,516,79.0,27.0,1.0,Local transmission,0.0,31/03/2020
+8,,Bahrain,515,39.0,4.0,0.0,Local transmission,0.0,31/03/2020
+9,,Lebanon,438,26.0,10.0,2.0,Local transmission,0.0,31/03/2020
+10,,Tunisia,312,34.0,8.0,0.0,Local transmission,0.0,31/03/2020
+11,,Jordan,259,13.0,3.0,2.0,Local transmission,0.0,31/03/2020
+12,,Kuwait,255,20.0,0.0,0.0,Local transmission,0.0,31/03/2020
+13,,Oman,167,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+14,,Afghanistan,114,0.0,4.0,0.0,Local transmission,1.0,31/03/2020
+15,,Djibouti,19,4.0,0.0,0.0,Local transmission,0.0,31/03/2020
+16,,Syrian Arab Republic,9,4.0,1.0,1.0,Imported cases only,0.0,31/03/2020
+17,,Libya,8,5.0,0.0,0.0,Local transmission,0.0,31/03/2020
+18,,Sudan,6,1.0,2.0,1.0,Imported cases only,0.0,31/03/2020
+19,,Somalia,3,0.0,0.0,0.0,Imported cases only,3.0,31/03/2020
+20,,,erritories**,,,,,,31/03/2020
+21,,"occupied Palestinianterritory",115,11.0,1.0,0.0,Local transmission,0.0,31/03/2020
+22,,,egion of the Americas,,,,,,31/03/2020
+23,,"United States ofAmerica",122653,19332.0,2112.0,444.0,Local transmission,0.0,31/03/2020
+24,,Canada,5655,898.0,61.0,6.0,Local transmission,0.0,31/03/2020
+25,,Brazil,3904,487.0,114.0,22.0,Local transmission,0.0,31/03/2020
+26,,Chile,1909,0.0,6.0,0.0,Local transmission,1.0,31/03/2020
+27,,Ecuador,1835,12.0,48.0,0.0,Local transmission,0.0,31/03/2020
+28,,Panama,901,115.0,17.0,3.0,Local transmission,0.0,31/03/2020
+29,,Mexico,848,131.0,16.0,4.0,Local transmission,0.0,31/03/2020
+30,,Argentina,745,55.0,19.0,2.0,Local transmission,0.0,31/03/2020
+31,,Peru,671,36.0,11.0,0.0,Local transmission,0.0,31/03/2020
+32,,Colombia,608,69.0,6.0,0.0,Local transmission,0.0,31/03/2020
+33,,Dominican Republic,581,0.0,20.0,0.0,Local transmission,2.0,31/03/2020
+34,,Uruguay,303,29.0,0.0,0.0,Local transmission,0.0,31/03/2020
+35,,Costa Rica,295,32.0,2.0,0.0,Local transmission,0.0,31/03/2020
+36,,Cuba,119,0.0,3.0,0.0,Local transmission,1.0,31/03/2020
+37,,"Venezuela (BolivarianRepublic of)",113,0.0,2.0,0.0,Local transmission,1.0,31/03/2020
+38,,Honduras,110,43.0,2.0,1.0,Local transmission,0.0,31/03/2020
+39,,Trinidad and Tobago,76,2.0,3.0,1.0,Local transmission,0.0,31/03/2020
+40,,"Bolivia (PlurinationalState of)",74,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+41,,Paraguay,59,3.0,3.0,0.0,Local transmission,0.0,31/03/2020
+42,,Guatemala,34,2.0,1.0,0.0,Local transmission,0.0,31/03/2020
+43,,Jamaica,32,2.0,1.0,0.0,Local transmission,0.0,31/03/2020
+44,,Barbados,26,2.0,0.0,0.0,Local transmission,0.0,31/03/2020
+45,,El Salvador,24,5.0,0.0,0.0,Local transmission,0.0,31/03/2020
+46,,Haiti,15,7.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+47,,Dominica,11,0.0,0.0,0.0,Local transmission,3.0,31/03/2020
+0,,Suriname,8,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+1,,Antigua and Barbuda,7,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+2,,Grenada,7,0.0,0.0,0.0,Local transmission,3.0,31/03/2020
+3,,Guyana,5,0.0,1.0,0.0,Local transmission,11.0,31/03/2020
+4,,Nicaragua,4,0.0,1.0,0.0,Imported cases only,1.0,31/03/2020
+5,,Saint Kitts and Nevis,4,2.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+6,,Saint Lucia,4,1.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+7,,Belize,2,0.0,0.0,0.0,Local transmission,4.0,31/03/2020
+8,,"Saint Vincent and theGrenadines",1,0.0,0.0,0.0,Imported cases only,17.0,31/03/2020
+9,,,Territories**,,,,,,31/03/2020
+10,,Martinique,105,12.0,2.0,1.0,Imported cases only,0.0,31/03/2020
+11,,Guadeloupe,96,0.0,2.0,0.0,Imported cases only,2.0,31/03/2020
+12,,Puerto Rico,64,0.0,2.0,0.0,Imported cases only,3.0,31/03/2020
+13,,Aruba,46,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+14,,French Guiana,31,0.0,0.0,0.0,Local transmission,2.0,31/03/2020
+15,,Bermuda,22,5.0,0.0,0.0,Local transmission,0.0,31/03/2020
+16,,"United States VirginIslands",22,5.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+17,,Cayman Islands,8,0.0,1.0,0.0,Imported cases only,4.0,31/03/2020
+18,,Curaçao,7,0.0,1.0,0.0,Imported cases only,3.0,31/03/2020
+19,,Saint Martin,6,0.0,0.0,0.0,Under investigation,0.0,31/03/2020
+20,,Montserrat,5,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+21,,Saint Barthélemy,5,0.0,0.0,0.0,Under investigation,2.0,31/03/2020
+22,,"Turks and CaicosIslands",4,2.0,0.0,0.0,Local transmission,0.0,31/03/2020
+23,,Sint Maarten,3,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+24,,Anguilla,2,0.0,0.0,0.0,Local transmission,3.0,31/03/2020
+25,,British Virgin Islands,2,0.0,0.0,0.0,Imported cases only,3.0,31/03/2020
+26,,,African Region,,,,,,31/03/2020
+27,,South Africa,1280,93.0,1.0,0.0,Local transmission,0.0,31/03/2020
+28,,Algeria,454,45.0,29.0,3.0,Local transmission,0.0,31/03/2020
+29,,Burkina Faso,222,76.0,3.0,0.0,Local transmission,0.0,31/03/2020
+30,,Cote d’Ivoire,165,25.0,0.0,0.0,Local transmission,0.0,31/03/2020
+31,,Ghana,152,15.0,5.0,1.0,Local transmission,0.0,31/03/2020
+32,,Senegal,142,23.0,0.0,0.0,Local transmission,0.0,31/03/2020
+33,,Cameroon,113,22.0,2.0,0.0,Local transmission,0.0,31/03/2020
+34,,Mauritius,102,0.0,2.0,0.0,Local transmission,1.0,31/03/2020
+35,,"Democratic Republicof the Congo",81,13.0,8.0,2.0,Local transmission,0.0,31/03/2020
+36,,Rwanda,70,10.0,0.0,0.0,Local transmission,0.0,31/03/2020
+37,,Nigeria,65,0.0,1.0,0.0,Local transmission,3.0,31/03/2020
+38,,Madagascar,37,11.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+39,,Uganda,33,19.0,0.0,0.0,Local transmission,0.0,31/03/2020
+40,,Togo,28,0.0,1.0,1.0,Local transmission,0.0,31/03/2020
+41,,Kenya,25,0.0,1.0,0.0,Local transmission,5.0,31/03/2020
+42,,Ethiopia,21,5.0,0.0,0.0,Local transmission,0.0,31/03/2020
+43,,Niger,20,10.0,3.0,2.0,Local transmission,0.0,31/03/2020
+44,,Congo,19,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+45,,Mali,18,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+46,,Guinea,16,8.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+47,,Zambia,16,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+48,,United Republic of,14,0.0,0.0,0.0,Under investigation,1.0,31/03/2020
+0,,Equatorial Guinea,13.0,7.0,0.0,0.0,Local transmission,0.0,31/03/2020
+1,,Namibia,11.0,3.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+2,,Eswatini,9.0,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+3,,Mozambique,8.0,0.0,0.0,0.0,Local transmission,1.0,31/03/2020
+4,,Seychelles,8.0,1.0,0.0,0.0,Imported cases only,0.0,31/03/2020
+5,,Gabon,7.0,0.0,1.0,0.0,Imported cases only,2.0,31/03/2020
+6,,Benin,6.0,0.0,0.0,0.0,Imported cases only,3.0,31/03/2020
+7,,Central African,,,,,,,31/03/2020
+8,,Republic,6.0,0.0,0.0,0.0,Imported cases only,2.0,31/03/2020
+9,,Eritrea,6.0,0.0,0.0,0.0,Imported cases only,3.0,31/03/2020
+10,,Cabo Verde,5.0,0.0,1.0,0.0,Imported cases only,2.0,31/03/2020
+11,,Chad,5.0,0.0,0.0,0.0,Imported cases only,3.0,31/03/2020
+12,,Mauritania,5.0,0.0,0.0,0.0,Imported cases only,1.0,31/03/2020
+13,,Zimbabwe,5.0,0.0,1.0,0.0,Local transmission,2.0,31/03/2020
+14,,Gambia,3.0,0.0,1.0,0.0,Imported cases only,1.0,31/03/2020
+15,,Liberia,3.0,0.0,0.0,0.0,Local transmission,8.0,31/03/2020
+16,,Angola,2.0,0.0,0.0,0.0,Imported cases only,8.0,31/03/2020
+17,,Guinea-Bissau,2.0,0.0,0.0,0.0,Imported cases only,4.0,31/03/2020
+18,,Territories**,,,,,,,31/03/2020
+19,,Réunion,207.0,64.0,0.0,0.0,Local transmission,0.0,31/03/2020
+20,,Mayotte,82.0,32.0,0.0,0.0,Local transmission,0.0,31/03/2020
+21,,Subtotal for all,,,,,,,31/03/2020
+22,,,692512.0,58411.0,33099.0,3215.0,,,31/03/2020
+23,,regions,,,,,,,31/03/2020
+24,,International,,,,,,,31/03/2020
+25,,conveyance (Diamond,712.0,0.0,7.0,0.0,Local transmission,14.0,31/03/2020
+26,,Princess),,,,,,,31/03/2020
+27,,Grand total,693224.0,58411.0,33106.0,3215.0,,,31/03/2020
