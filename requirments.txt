@@ -1,0 +1,7 @@
+requests
+pytz
+tabula-py
+pandas
+gitpython
+yagmail
+email
