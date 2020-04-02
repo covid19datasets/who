@@ -12,4 +12,6 @@ def mail(subject, contents):
             mailing_list.append(line)
 
     for email in mailing_list:
-        yag.send(email, subject, contents)
+        if attachment is None:
+            yag.send(email, subject, '.log')
+    shutil.rmtree('.log', ignore_errors=False)
