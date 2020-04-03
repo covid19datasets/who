@@ -15,13 +15,6 @@ import numpy as np
 from send_log import mail
 
 
-def git_access_token() -> str:
-    """Access token for git repositories.
-
-    :returns: [str] A git access token."""
-    return "d26e9987762113e07845027136baaf388a0277f1"
-
-
 def git_clone(http: str, scrape_date) -> git.Repo:
     """Clone a git repo
 
@@ -172,15 +165,14 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
     return viable_dfs
 
 
-def scrape(http, test, scrape_date):
+def scrape(http, test, scrape_date, git_access_token):
     """Main pipeline for the scarper"""
     define_logger()
     logger = logging.getLogger('Situational Report Scraper')
-
     table = get_situation_report(http, scrape_date)
-
+    print(git_access_token)
     repo = git_clone(
-        'https://{}'.format(git_access_token()) +
+        'https://{}'.format(git_access_token) +
         ':x-oauth-basic@github.com/covid19datasets/who',
         scrape_date.strftime('%d%m%Y')
     )
@@ -192,22 +184,18 @@ def scrape(http, test, scrape_date):
     # These changes are logged and sent as an email.
     previous_table = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), header=0)
 
+    # We write today's table:
+    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), index=False)
+
     # We concatenate the new table onto the old one and save it:
     # We also force their to only be 10 columns to remove garbage picked up.
     #table = pd.concat([previous_table.loc[:, :11], table.loc[:, :11]])
     table = pd.concat([previous_table, table])
 
-    if scrape_date.strftime('%d/%m/%Y') in table['Date'].unique():
-        table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
-    else:
-        logger.error(
-            'ERROR: Failed to scrape. The scraper has failed for an unknown reason to scrape!'
-            ' No data was appended to the csv!!'
-        )
-        raise Exception('The data was lost during the scraping!!!')
+    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
 
     if test.upper() != 'YES':
-        git_push(scrape_date=scrape_date)
+        git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
         repo.close()
 
     # Cleanup:

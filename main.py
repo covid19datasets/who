@@ -58,6 +58,11 @@ if __name__ == '__main__':
     # We parse arguments in case manual changes are needed:
     parser = argparse.ArgumentParser(description='Poll for SitRep existence and scrape it to the Github repo.')
     parser.add_argument(
+        '--token',
+        type=str,
+        help='Token for github.'
+    )
+    parser.add_argument(
         '--date',
         type=str,
         help='Date of wanted SitRep in format DDMMYYYY (Bare in mind the time is in CET)',
@@ -73,7 +78,11 @@ if __name__ == '__main__':
         nargs='?',
         const=1
     )
+
     args = parser.parse_args()
+
+    if args.token is None:
+        raise ValueError('A Github Token is required!!!')
 
     if args.date is 'None':
         scrape_date = datetime.now(pytz.timezone('CET')).date()
@@ -83,6 +92,7 @@ if __name__ == '__main__':
             month=int(args.date[2:4]),
             year=int(args.date[4:])
         )
+    from datetime import timedelta
 
     http = construct_http(scrape_date)
     check_link(http)
