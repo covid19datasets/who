@@ -114,45 +114,45 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
     logger = logging.getLogger('Situational Report Scraper')
 
     pdf_table = tabula.read_pdf(http, pages='all')
+    viable_dfs = []
 
     # The current format is 7 columns with unknown amount of rows.
     # In case a new table is added we will automatically remove it.
     for df in pdf_table:
-        if len(df.keys()) is not 7:
+        if len(df.keys()) is 7:
+            try:
+                # We set each of the data frames to have the new keys:
+                df.columns = [
+                    'Country/Region',
+                    'Cumulative Confirmed Cases',
+                    'Total New Confirmed Cases',
+                    'Cumulative Deaths',
+                    'Total New Deaths',
+                    'Classification of Transmission',
+                    'Days Since Previous Reported Case'
+                ]
+                viable_dfs.append(df)
+            except ValueError:
+                logger.warning('A table of incorrect size attempted to write!')
+        else:
             try:
                 pdf_table.remove(df)
             except ValueError:
-                logger.error('Err: Failed to remove an entry of incorrect dimensions')
-            logger.warning('WARN: We have detected a new format of table in today\'s report')
+                logger.warning('Failed to remove an entry of incorrect dimensions')
+            logger.warning('We have detected a new format of table in today\'s report')
 
     # If the table is of a different format the scraper will fail so we throw an
     # exception.
     if len(pdf_table) is 0:
-        logger.error('ERR: No Table was found in the PDF or the format was changed!')
+        logger.error('No Table was found in the PDF or the format was changed!')
         mail('ERROR: Failed to scrape.',
              'The scraper could not find table of the correct format to scrape!')
         raise ValueError('The table was of the incorrect proportions or missing!')
 
-    # We set each of the data frames to have the new keys:
-    for df in pdf_table:
-        try:
-            df.columns = [
-                'Country/Region',
-                'Cumulative Confirmed Cases',
-                'Total New Confirmed Cases',
-                'Cumulative Deaths',
-                'Total New Deaths',
-                'Classification of Transmission',
-                'Days Since Previous Reported Case'
-            ]
-        except ValueError:
-            logger.warning('WARN: A table of incorrect size attempted to write!')
-
     # We concatenate the cleaned up list of data frames:
-    pdf_table = pd.concat(pdf_table)
-
+    viable_dfs = pd.concat(viable_dfs)
     # We clean the table:
-    pdf_table = clean(pdf_table)
+    viable_dfs = clean(viable_dfs)
 
     dates = []
     retrieved_dates = []
@@ -160,21 +160,22 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
 
     report_num = scrape_date - date(2020, 1, 20)
     date_of_retrieval = datetime.now(pytz.timezone('Australia/Canberra'))
-    for row in range(len(pdf_table)):
+    for row in range(len(viable_dfs)):
         dates.append(scrape_date.strftime('%d/%m/%Y'))
         retrieved_dates.append(date_of_retrieval)
-        report_nums.append(report_num)
+        report_nums.append(report_num.days)
 
-    pdf_table['Date'] = pd.Series(dates)
-    pdf_table['Retrieved'] = pd.Series(retrieved_dates)
-    pdf_table['Report Number'] = pd.Series(report_nums)
+    viable_dfs['Date'] = pd.Series(dates)
+    viable_dfs['Retrieved'] = pd.Series(retrieved_dates)
+    viable_dfs['Report Number'] = pd.Series(report_nums)
 
-    return pdf_table
+    return viable_dfs
 
 
 def scrape(http, test, scrape_date):
     """Main pipeline for the scarper"""
     define_logger()
+    logger = logging.getLogger('Situational Report Scraper')
 
     table = get_situation_report(http, scrape_date)
 
@@ -193,11 +194,20 @@ def scrape(http, test, scrape_date):
 
     # We concatenate the new table onto the old one and save it:
     # We also force their to only be 10 columns to remove garbage picked up.
-    table = pd.concat([previous_table.loc[:, :11], table.loc[:, :11]])
-    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
+    #table = pd.concat([previous_table.loc[:, :11], table.loc[:, :11]])
+    table = pd.concat([previous_table, table])
+
+    if scrape_date.strftime('%d/%m/%Y') in table['Date'].unique():
+        table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
+    else:
+        logger.error(
+            'ERROR: Failed to scrape. The scraper has failed for an unknown reason to scrape!'
+            ' No data was appended to the csv!!'
+        )
+        raise Exception('The data was lost during the scraping!!!')
 
     if test.upper() != 'YES':
-        #git_push(scrape_date=scrape_date)
+        git_push(scrape_date=scrape_date)
         repo.close()
 
     # Cleanup:
