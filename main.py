@@ -4,9 +4,11 @@ import time
 from send_log import mail
 import argparse
 from scrape import scrape
+import pytz
 from datetime import datetime
 from datetime import date
-import pytz
+import logging
+import os
 
 
 def check_link(http: str):
@@ -56,11 +58,20 @@ if __name__ == '__main__':
     # We parse arguments in case manual changes are needed:
     parser = argparse.ArgumentParser(description='Poll for SitRep existence and scrape it to the Github repo.')
     parser.add_argument(
-        '--date', type=str, help='Date of wanted SitRep in format DDMMYYYY'
-                               '(Bare in mind the time is in CET)', default='None', nargs='?'
+        '--date',
+        type=str,
+        help='Date of wanted SitRep in format DDMMYYYY (Bare in mind the time is in CET)',
+        default='None',
+        nargs='?',
+        const=1
     )
     parser.add_argument(
-        '--test', type=str, help='For test purposes, it will only change the test branch.', default='No', nargs='?'
+        '--test',
+        type=str,
+        help='For test purposes, it will only change the test branch.',
+        default='No',
+        nargs='?',
+        const=1
     )
     args = parser.parse_args()
 
@@ -73,33 +84,21 @@ if __name__ == '__main__':
             year=int(args.date[4:])
         )
 
-    from datetime import datetime
-    from datetime import timedelta
-    from datetime import date
-    start = date(
-        day=2,
-        month=3,
-        year=2020
-    )
-    today = datetime.now(pytz.timezone('CET')).date()
-    today += timedelta(days=-1)
-    for i in range(31):
-        print(today.strftime('%d%m%Y'))
-        http = construct_http(today)
-        check_link(http)
-        try:
-            scrape(http, 'no', today.strftime('%d%m%Y'))
-        except:
-            with open('broke.txt', 'a') as file:
-                file.write(today.strftime('%d%m%Y'))
-                file.write('\n')
-        today += timedelta(days=-1)
-
-    #http = construct_http(scrape_date)
-    #check_link(http)
-    #scrape(http, args.test, scrape_date.strftime('%d%m%Y'))
-    #mail(
-    #    '{} Success!'.format(scrape_date.strftime('%d%m%Y')),
-    #    'The situation report for {}'.format(scrape_date.strftime('%d%m%Y')) +
-    #    'Was successfully scraped and uploaded. Please review the attached logs!'
-    #)
+    http = construct_http(scrape_date)
+    check_link(http)
+    try:
+        scrape(http, args.test, scrape_date)
+        mail(
+            '{} Success!'.format(scrape_date.strftime('%d%m%Y')),
+            'The situation report for {}'.format(scrape_date.strftime('%d%m%Y')) +
+            'Was successfully scraped and uploaded. Please review the attached logs!'
+        )
+    except Exception as e:
+        mail(
+            '{} Failure! {}'.format(scrape_date.strftime('%d%m%Y'), e),
+            'The situation report for {}'.format(scrape_date.strftime('%d%m%Y')) +
+            'has failed to be scraped and uploaded. Please review the attached logs!'
+        )
+    finally:
+        logging.shutdown()
+        os.remove('.log')

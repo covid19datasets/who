@@ -85,41 +85,19 @@ def clean(df):
     """Clean the given dataframe for known issues."""
     # drop the first row because it is just a region.
     df = df.iloc[1:]
-    print(df.keys())
     # keep first seven columns
     df = df[df.columns[:7]]
-
-    # TODO
-    #   REGEX needs to be used to check whether or not the first character is there in the below strings etc..
-    unwanted_titles = [
-        "Western Pacific Region",
-        "Territories**",
-        "Territory/Area†",
-        "European Region",
-        "South-East Asia Region",
-        "Eastern Mediterranean Region",
-        "Region of the Americas",
-        "African Region",
-        "Subtotal for all",
-        "regions",
-        "Grand total",
-        "astern Mediterranean Region",
-        "erritories**",
-        "egion of the Americas",
-        "outh-East Asia Region",
-        "Reporting Country/"
-    ]
 
     # Combine rows where the are empty
     # Count the empty cells
     df['count'] = df.apply(lambda x: x.count(), axis=1)
 
     # those will 6 empties need to be moved to join the next
-    df['above_country'] = df['Territory/Area'].shift(1)
+    df['above_country'] = df['Country/Region'].shift(1)
     df['above_count'] = df['count'].shift(1)
 
     df['new_area'] = (
-        np.where(df['above_count'] == 2, df['above_country'] + ' ' + df['Territory/Area'], df['Territory/Area'])
+        np.where(df['above_count'] == 2, df['above_country'] + ' ' + df['Country/Region'], df['Country/Region'])
     )
 
     # Drop unwanted rows that we know are region/area titles
@@ -159,7 +137,7 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
     for df in pdf_table:
         try:
             df.columns = [
-                'Territory/Area',
+                'Country/Region',
                 'Cumulative Confirmed Cases',
                 'Total New Confirmed Cases',
                 'Cumulative Deaths',
@@ -170,7 +148,7 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
         except ValueError:
             logger.warning('WARN: A table of incorrect size attempted to write!')
 
-    # We concatenate the cleaned up list of dataframes:
+    # We concatenate the cleaned up list of data frames:
     pdf_table = pd.concat(pdf_table)
 
     # We clean the table:
@@ -178,14 +156,18 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
 
     dates = []
     retrieved_dates = []
+    report_nums = []
 
+    report_num = scrape_date - date(2020, 1, 20)
     date_of_retrieval = datetime.now(pytz.timezone('Australia/Canberra'))
     for row in range(len(pdf_table)):
-        dates.append(scrape_date)
+        dates.append(scrape_date.strftime('%d/%m/%Y'))
         retrieved_dates.append(date_of_retrieval)
+        report_nums.append(report_num)
 
-    pdf_table['date'] = pd.Series(dates)
-    pdf_table['retrieved'] = pd.Series(retrieved_dates)
+    pdf_table['Date'] = pd.Series(dates)
+    pdf_table['Retrieved'] = pd.Series(retrieved_dates)
+    pdf_table['Report Number'] = pd.Series(report_nums)
 
     return pdf_table
 
@@ -199,7 +181,7 @@ def scrape(http, test, scrape_date):
     repo = git_clone(
         'https://{}'.format(git_access_token()) +
         ':x-oauth-basic@github.com/covid19datasets/who',
-        scrape_date
+        scrape_date.strftime('%d%m%Y')
     )
 
     if test.upper() == 'YES':
@@ -207,14 +189,15 @@ def scrape(http, test, scrape_date):
 
     # We read the old table and take note of any significant changes.
     # These changes are logged and sent as an email.
-    previous_table = pd.read_csv(os.path.join(scrape_date, 'who', 'current.csv'), header=0)
+    previous_table = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), header=0)
 
     # We concatenate the new table onto the old one and save it:
-    table = pd.concat([previous_table, table])
-    table.to_csv(os.path.join(scrape_date, 'who', 'current.csv'), index=False)
+    # We also force their to only be 10 columns to remove garbage picked up.
+    table = pd.concat([previous_table.loc[:, :11], table.loc[:, :11]])
+    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
 
     if test.upper() != 'YES':
-        git_push(scrape_date=scrape_date)
+        #git_push(scrape_date=scrape_date)
         repo.close()
 
     # Cleanup:
