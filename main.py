@@ -71,10 +71,10 @@ if __name__ == '__main__':
         const=1
     )
     parser.add_argument(
-        '--test',
+        '--branch',
         type=str,
         help='For test purposes, it will only change the test branch.',
-        default='No',
+        default='test',
         nargs='?',
         const=1
     )

@@ -11,7 +11,6 @@ import errno
 import stat
 import shutil
 import logging
-import numpy as np
 from send_log import mail
 
 
@@ -31,7 +30,7 @@ def git_clone(http: str, scrape_date) -> git.Repo:
 
 def git_push(scrape_date):
     """Push commit to repo."""
-    commit_message = ('fix: added sit rep for {} (It was not correctly recorded)'.format(scrape_date))
+    commit_message = ('Automatic Update: added sit rep for {}.'.format(scrape_date))
 
     repo = git.Repo(os.path.join(scrape_date, 'who'))
     repo.git.add(update=True)
@@ -76,26 +75,55 @@ def define_logger():
 
 def clean(df):
     """Clean the given dataframe for known issues."""
-    # drop the first row because it is just a region.
+    # drop the first row
     df = df.iloc[1:]
-    # keep first seven columns
-    df = df[df.columns[:7]]
 
-    # Combine rows where the are empty
-    # Count the empty cells
-    df['count'] = df.apply(lambda x: x.count(), axis=1)
+    # keep first seven columns, label columns (because i'm useless at indexing)
+    df = df[, :7]
 
-    # those will 6 empties need to be moved to join the next
-    df['above_country'] = df['Country/Region'].shift(1)
-    df['above_count'] = df['count'].shift(1)
+    df.columns = ['Country', 'Confirmed', 'New', 'deaths', 'new deaths', 'Classification', 'Reported', 'date']
 
-    df['new_area'] = (
-        np.where(df['above_count'] == 2, df['above_country'] + ' ' + df['Country/Region'], df['Country/Region'])
-    )
+    unwanted_titles = ["Western Pacific Region", "Territories**", "Territory/Area†", "European Region",
+                       "South-East Asia Region",
+                       "Eastern Mediterranean Region", "Region of the Americas", "African Region", "Subtotal for all",
+                       "regions", "Grand total", "astern Mediterranean Region", "erritories**", "egion of the Americas",
+                       "outh-East Asia Region", "Reporting Country/"]
 
     # Drop unwanted rows that we know are region/area titles
-    df = df.dropna()
-    return df[df.columns[:7]]
+    df = df[~df['Confirmed'].isin(unwanted_titles)]
+    df = df[~df['Country'].isin(unwanted_titles)]
+
+    # Combine rows where they are empty
+    # Count the completed cells per row
+    df['count'] = df.apply(lambda x: x.count(), axis=1)
+    df = df.reset_index()
+
+    # if the count is 2 then the value has to be inserted in front of the row below:
+    df['Country/Region'] = df['Country']
+    for i in df.index:
+        if i is df.index[-1]:
+            break
+        if df['count'][i] == 2:
+            df.at[i + 1, 'Country/Region'] = str(df['Country/Region'][i]) + ' ' + str(df['Country/Region'][i + 1])
+
+    # drop the na columns
+    df = df[df['count'] > 2]
+    # drop the na rows - need to do an 'awake' eyeball of these before I drop them
+    df = df[~df.Country.isna()]
+    df = df[~df.Country.str.contains("Total")]  # These caused issues trying to remove them earlier in the code
+    df = df[~df.Country.str.contains("total")]  # These caused issues trying to remove them earlier in the code
+
+    df.columns = [
+        'Country/Region',
+        'Cumulative Confirmed Cases',
+        'Total New Confirmed Cases',
+        'Cumulative Deaths',
+        'Total New Deaths',
+        'Classification of Transmission',
+        'Days Since Previous Reported Case'
+    ]
+
+    return df
 
 
 def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
@@ -165,7 +193,7 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
     return viable_dfs
 
 
-def scrape(http, test, scrape_date, git_access_token):
+def scrape(http, branch, scrape_date, git_access_token):
     """Main pipeline for the scarper"""
     define_logger()
     logger = logging.getLogger('Situational Report Scraper')
@@ -177,8 +205,8 @@ def scrape(http, test, scrape_date, git_access_token):
         scrape_date.strftime('%d%m%Y')
     )
 
-    if test.upper() == 'YES':
-        repo.git.checkout('test')
+    # We checkout the predefined branch in the args:
+    repo.git.checkout(branch)
 
     # We read the old table and take note of any significant changes.
     # These changes are logged and sent as an email.
@@ -194,9 +222,8 @@ def scrape(http, test, scrape_date, git_access_token):
 
     table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
 
-    if test.upper() != 'YES':
-        git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
-        repo.close()
+    git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
+    repo.close()
 
     # Cleanup:
     #shutil.rmtree('who', ignore_errors=False, onerror=remove_readonly)
