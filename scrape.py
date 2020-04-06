@@ -3,15 +3,11 @@
 from datetime import datetime
 from datetime import date
 import pytz
-import tabula
+from tabula.io import read_pdf
 import pandas as pd
 import git
 import os
-import errno
-import stat
-import shutil
 import logging
-import numpy as np
 from send_log import mail
 
 
@@ -31,7 +27,7 @@ def git_clone(http: str, scrape_date) -> git.Repo:
 
 def git_push(scrape_date):
     """Push commit to repo."""
-    commit_message = ('fix: added sit rep for {} (It was not correctly recorded)'.format(scrape_date))
+    commit_message = ('Automatic Update: added sit rep for {}.'.format(scrape_date))
 
     repo = git.Repo(os.path.join(scrape_date, 'who'))
     repo.git.add(update=True)
@@ -39,24 +35,6 @@ def git_push(scrape_date):
     repo.index.commit(commit_message)
     origin = repo.remote(name='origin')
     origin.push()
-
-
-def remove_readonly(func, path, exc):
-    """Remove a readonly directory on unix."""
-    logger = logging.getLogger('Situational Report Scraper')
-    excvalue = exc[1]
-    if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
-
-        # ensure parent directory is writeable too
-        pardir = os.path.abspath(os.path.join(path, os.path.pardir))
-        if not os.access(pardir, os.W_OK):
-            os.chmod(pardir, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO)
-
-        os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO)  # 0777
-        func(path)
-    else:
-        logger.error('ERR: Could not remove files in clean up!')
-        raise
 
 
 def define_logger():
@@ -75,26 +53,43 @@ def define_logger():
 
 
 def clean(df):
-    """Clean the given dataframe for known issues."""
-    # drop the first row because it is just a region.
+    """Clean the given data frame for known issues."""
+    # drop the first row
     df = df.iloc[1:]
-    # keep first seven columns
+
+    # keep first seven columns, label columns (because i'm useless at indexing)
     df = df[df.columns[:7]]
 
-    # Combine rows where the are empty
-    # Count the empty cells
-    df['count'] = df.apply(lambda x: x.count(), axis=1)
-
-    # those will 6 empties need to be moved to join the next
-    df['above_country'] = df['Country/Region'].shift(1)
-    df['above_count'] = df['count'].shift(1)
-
-    df['new_area'] = (
-        np.where(df['above_count'] == 2, df['above_country'] + ' ' + df['Country/Region'], df['Country/Region'])
-    )
+    unwanted_titles = ["Western Pacific Region", "Territories**", "Territory/Area†", "European Region",
+                       "South-East Asia Region",
+                       "Eastern Mediterranean Region", "Region of the Americas", "African Region", "Subtotal for all",
+                       "regions", "Grand total", "astern Mediterranean Region", "erritories**", "egion of the Americas",
+                       "outh-East Asia Region", "Reporting Country/"]
 
     # Drop unwanted rows that we know are region/area titles
-    df = df.dropna()
+    df = df[~df['Cumulative Confirmed Cases'].isin(unwanted_titles)]
+    df = df[~df['Country/Region'].isin(unwanted_titles)]
+
+    # Combine rows where they are empty
+    # Count the completed cells per row
+    df['count'] = df.apply(lambda x: x.count(), axis=1)
+    df = df.reset_index()
+
+    # if the count is 2 then the value has to be inserted in front of the row below:
+    for i in df.index:
+        if i is df.index[-1]:
+            break
+        if df['count'][i] == 2:
+            df.at[i + 1, 'Country/Region'] = str(df['Country/Region'][i]) + ' ' + str(df['Country/Region'][i + 1])
+
+    # drop the na columns
+    df = df[df['count'] > 2]
+
+    # drop the na rows - need to do an 'awake' eyeball of these before I drop them
+    df = df[~df['Country/Region'].isna()]
+    df = df[~df['Country/Region'].str.contains("Total")]
+    df = df[~df['Country/Region'].str.contains("total")]
+
     return df[df.columns[:7]]
 
 
@@ -106,7 +101,7 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
     :returns: A list of Pandas Dataframes for each pdf page"""
     logger = logging.getLogger('Situational Report Scraper')
 
-    pdf_table = tabula.read_pdf(http, pages='all')
+    pdf_table = read_pdf(http, pages='all')
     viable_dfs = []
 
     # The current format is 7 columns with unknown amount of rows.
@@ -158,45 +153,45 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
         retrieved_dates.append(date_of_retrieval)
         report_nums.append(report_num.days)
 
-    viable_dfs['Date'] = pd.Series(dates)
-    viable_dfs['Retrieved'] = pd.Series(retrieved_dates)
-    viable_dfs['Report Number'] = pd.Series(report_nums)
+    viable_dfs['Date'] = pd.Series(dates, index=viable_dfs.index)
+    viable_dfs['Retrieved'] = pd.Series(retrieved_dates, index=viable_dfs.index)
+    viable_dfs['Report Number'] = pd.Series(report_nums, index=viable_dfs.index)
 
     return viable_dfs
 
 
-def scrape(http, test, scrape_date, git_access_token):
+def scrape(http, branch, scrape_date, git_access_token):
     """Main pipeline for the scarper"""
     define_logger()
-    logger = logging.getLogger('Situational Report Scraper')
     table = get_situation_report(http, scrape_date)
-    print(git_access_token)
     repo = git_clone(
         'https://{}'.format(git_access_token) +
         ':x-oauth-basic@github.com/covid19datasets/who',
         scrape_date.strftime('%d%m%Y')
     )
 
-    if test.upper() == 'YES':
-        repo.git.checkout('test')
+    # We checkout the predefined branch in the args:
+    repo.git.checkout(branch)
 
     # We read the old table and take note of any significant changes.
     # These changes are logged and sent as an email.
-    previous_table = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), header=0)
+    previous_historic = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), header=0)
+    previous_today = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), header=0)
+
+    old_countries = set(previous_today['Country/Region']) - set(table['Country/Region'])
+    new_countries = set(table['Country/Region']) - set(previous_today['Country/Region'])
 
     # We write today's table:
-    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), index=False)
+    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), index=False) #
 
     # We concatenate the new table onto the old one and save it:
-    # We also force their to only be 10 columns to remove garbage picked up.
-    #table = pd.concat([previous_table.loc[:, :11], table.loc[:, :11]])
-    table = pd.concat([previous_table, table])
+    table = pd.concat([previous_historic, table])
 
-    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'current.csv'), index=False)
+    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), index=False)
 
-    if test.upper() != 'YES':
-        git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
-        repo.close()
+    git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
+    repo.close()
 
-    # Cleanup:
-    #shutil.rmtree('who', ignore_errors=False, onerror=remove_readonly)
+    # We return the difference of the countries between yesterday and today so they can be added
+    # to the email message.
+    return {'new_countries': new_countries, 'old_countries': old_countries}
