@@ -15,7 +15,7 @@ import stat
 import shutil
 
 
-def check_link(http: str):
+def check_link(http: str, http_mp: str):
     """Check that a http link is accessible.
 
     :http: [str] The link to be checked for accessibility.
@@ -23,25 +23,37 @@ def check_link(http: str):
     :return: The status ode of the URL.
     """
     r = requests.get(http)
+    r_mp = requests.get(http_mp)
     # The situation reports are produced at different times so poll
     # for the report until it is produced and uploaded!
-    if r.status_code != 200:
-        for i in range(48):
-            time.sleep(1800)
-            r = requests.get(http)
-            if r.status_code == 200:
-                break
+    if r.status_code == 200:
+        return http
+    if r_mp.status_code == 200:
+        return http_mp
 
-    if r.status_code != 200:
-        mail('FAILURE: Received {}'.format(r.status_code),
-             'Failed to connect, received {}'.format(r.status_code) +
-             '\nNo file will be uploaded, please retrieve the information'
-             'manually!'
-             )
-        raise ConnectionError
+    for i in range(48):
+        r = requests.get(http)
+        r_mp = requests.get(http_mp)
+        if r.status_code == 200:
+            return http
+        if r_mp.status_code == 200:
+            return http
+        time.sleep(1800)
+
+    if r.status_code == 200:
+        return http
+    if r_mp.status_code == 200:
+        return http
+
+    mail('FAILURE: Received {}'.format(r.status_code),
+         'Failed to connect, received {}'.format(r.status_code) +
+         '\nNo file will be uploaded, please retrieve the information'
+         'manually!'
+         )
+    raise ConnectionError
 
 
-def construct_http(fetch_date) -> str:
+def construct_http(fetch_date):
     """Constructs the http for the current day
 
     :date: [date] A date can be manually entered if needed.
@@ -52,10 +64,12 @@ def construct_http(fetch_date) -> str:
     current_datetime = datetime.now(pytz.timezone('CET'))
     report_no = fetch_date - date(2020, 1, 20)
     date_string = fetch_date.strftime('%Y%m%d')
-    http = 'https://www.who.int/docs/default-source/coronaviruse/situation-'\
-       'reports/{}-sitrep-{}-covid-19.pdf'.format(date_string, report_no.days)
+    http = 'https://www.who.int/docs/default-source/coronaviruse/situation-' \
+           'reports/{}-sitrep-{}-covid-19.pdf'.format(date_string, report_no.days)
+    http_mp = 'https://www.who.int/docs/default-source/coronaviruse/situation-' \
+           'reports/{}-sitrep-{}-covid-19-mp.pdf'.format(date_string, report_no.days)
 
-    return current_datetime.strftime(http)
+    return current_datetime.strftime(http), current_datetime.strftime(http_mp)
 
 
 def remove_readonly(func, path, exc):
@@ -108,10 +122,11 @@ if __name__ == '__main__':
             year=int(args.date[4:])
         )
 
-    http = construct_http(scrape_date)
-    check_link(http)
+    http, http_mp = construct_http(scrape_date)
+    correct_link = check_link(http, http_mp)
+
     try:
-        countries = scrape(http, args.branch, scrape_date, args.token)
+        countries = scrape(correct_link, args.branch, scrape_date, args.token)
         if len(countries['new_countries']) == 0:
             countries['new_countries'] = 'None'
         if len(countries['old_countries']) == 0:

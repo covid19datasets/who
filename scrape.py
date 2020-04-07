@@ -65,7 +65,7 @@ def clean(df):
                        "South-East Asia Region",
                        "Eastern Mediterranean Region", "Region of the Americas", "African Region", "Subtotal for all",
                        "regions", "Grand total", "astern Mediterranean Region", "erritories**", "egion of the Americas",
-                       "outh-East Asia Region", "Reporting Country/", "Territory/Area †"]
+                       "outh-East Asia Region", "Reporting Country/", "Territory/Area †", "Territory/Area  â€ "]
 
     # Drop unwanted rows that we know are region/area titles
     df = df[~df['Cumulative Confirmed Cases'].isin(unwanted_titles)]
@@ -164,7 +164,10 @@ def scrape(http, branch, scrape_date, git_access_token):
     """Main pipeline for the scarper"""
     define_logger()
     table = get_situation_report(http, scrape_date)
-    table = table.drop('index')
+
+    if 'index' in table.columns:
+        table = table.drop(columns=['index'])
+
     repo = git_clone(
         'https://{}'.format(git_access_token) +
         ':x-oauth-basic@github.com/covid19datasets/who',
