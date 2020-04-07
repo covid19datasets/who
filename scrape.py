@@ -3,7 +3,7 @@
 from datetime import datetime
 from datetime import date
 import pytz
-from tabula.io import read_pdf
+from tabula import read_pdf
 import pandas as pd
 import git
 import os
@@ -38,6 +38,7 @@ def git_push(scrape_date):
 
 
 def define_logger():
+    """Define a logger to handle outputs."""
     logger = logging.getLogger('Situational Report Scraper')
 
     handler = logging.StreamHandler()
@@ -64,10 +65,10 @@ def clean(df):
                        "South-East Asia Region",
                        "Eastern Mediterranean Region", "Region of the Americas", "African Region", "Subtotal for all",
                        "regions", "Grand total", "astern Mediterranean Region", "erritories**", "egion of the Americas",
-                       "outh-East Asia Region", "Reporting Country/"]
+                       "outh-East Asia Region", "Reporting Country/", "Territory/Area †"]
 
     # Drop unwanted rows that we know are region/area titles
-    df = df[~df['Confirmed'].isin(unwanted_titles)]
+    df = df[~df['Cumulative Confirmed Cases'].isin(unwanted_titles)]
     df = df[~df['Country/Region'].isin(unwanted_titles)]
 
     # Combine rows where they are empty
@@ -82,7 +83,6 @@ def clean(df):
         if df['count'][i] == 2:
             df.at[i + 1, 'Country/Region'] = str(df['Country/Region'][i]) + ' ' + str(df['Country/Region'][i + 1])
 
-    # drop the na columns
     df = df[df['count'] > 2]
 
     # drop the na rows - need to do an 'awake' eyeball of these before I drop them
@@ -93,7 +93,27 @@ def clean(df):
     return df[df.columns[:7]]
 
 
-def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
+def append_dates(df: pd.DataFrame(), scrape_date) -> pd.DataFrame:
+    """Append date of report and current date to data frame."""
+    dates = []
+    retrieved_dates = []
+    report_nums = []
+
+    report_num = scrape_date - date(2020, 1, 20)
+    date_of_retrieval = datetime.now(pytz.timezone('Australia/Canberra'))
+    for row in range(len(df)):
+        dates.append(scrape_date.strftime('%d/%m/%Y'))
+        retrieved_dates.append(date_of_retrieval)
+        report_nums.append(report_num.days)
+
+    df['Date'] = pd.Series(dates, index=df.index)
+    df['Retrieved'] = pd.Series(retrieved_dates, index=df.index)
+    df['Report Number'] = pd.Series(report_nums, index=df.index)
+
+    return df
+
+
+def get_situation_report(http: str, scrape_date):
     """Extract a table from the given URL.
 
     :http: [str] The url to scrape from.
@@ -101,13 +121,13 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
     :returns: A list of Pandas Dataframes for each pdf page"""
     logger = logging.getLogger('Situational Report Scraper')
 
-    pdf_table = read_pdf(http, pages='all')
+    pdf_table = read_pdf(http, pages='all', pandas_options={'header':None})
     viable_dfs = []
 
     # The current format is 7 columns with unknown amount of rows.
     # In case a new table is added we will automatically remove it.
     for df in pdf_table:
-        if len(df.keys()) is 7:
+        if len(df.keys()) == 7:
             try:
                 # We set each of the data frames to have the new keys:
                 df.columns = [
@@ -122,16 +142,10 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
                 viable_dfs.append(df)
             except ValueError:
                 logger.warning('A table of incorrect size attempted to write!')
-        else:
-            try:
-                pdf_table.remove(df)
-            except ValueError:
-                logger.warning('Failed to remove an entry of incorrect dimensions')
-            logger.warning('We have detected a new format of table in today\'s report')
 
     # If the table is of a different format the scraper will fail so we throw an
     # exception.
-    if len(pdf_table) is 0:
+    if len(pdf_table) == 0:
         logger.error('No Table was found in the PDF or the format was changed!')
         mail('ERROR: Failed to scrape.',
              'The scraper could not find table of the correct format to scrape!')
@@ -139,31 +153,18 @@ def get_situation_report(http: str, scrape_date) -> pd.DataFrame:
 
     # We concatenate the cleaned up list of data frames:
     viable_dfs = pd.concat(viable_dfs)
+
     # We clean the table:
-    viable_dfs = clean(viable_dfs)
+    cleaned_dfs = clean(viable_dfs)
 
-    dates = []
-    retrieved_dates = []
-    report_nums = []
-
-    report_num = scrape_date - date(2020, 1, 20)
-    date_of_retrieval = datetime.now(pytz.timezone('Australia/Canberra'))
-    for row in range(viable_dfs.index[-1]):
-        dates.append(scrape_date.strftime('%d/%m/%Y'))
-        retrieved_dates.append(date_of_retrieval)
-        report_nums.append(report_num.days)
-
-    viable_dfs['Date'] = pd.Series(dates, index=viable_dfs.index)
-    viable_dfs['Retrieved'] = pd.Series(retrieved_dates, index=viable_dfs.index)
-    viable_dfs['Report Number'] = pd.Series(report_nums, index=viable_dfs.index)
-
-    return viable_dfs
+    return cleaned_dfs
 
 
 def scrape(http, branch, scrape_date, git_access_token):
     """Main pipeline for the scarper"""
     define_logger()
     table = get_situation_report(http, scrape_date)
+    table = table.drop('index')
     repo = git_clone(
         'https://{}'.format(git_access_token) +
         ':x-oauth-basic@github.com/covid19datasets/who',
@@ -178,18 +179,22 @@ def scrape(http, branch, scrape_date, git_access_token):
     previous_historic = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), header=0)
     previous_today = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), header=0)
 
-    new_countries = set(previous_today['Country/Region']) - set(table['Country/Region'])
-    old_countries = set(table['Country/Region']) - set(previous_today['Country/Region'])
+    old_countries = set(previous_today['Country/Region']) - set(table['Country/Region'])
+    new_countries = set(table['Country/Region']) - set(previous_today['Country/Region'])
+
+    # We add the dates to the table:
+    table = append_dates(table, scrape_date)
 
     # We write today's table:
-    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), index=False) #
+    table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), index=False)
+    table.to_csv('today.csv', index=False)
 
     # We concatenate the new table onto the old one and save it:
     table = pd.concat([previous_historic, table])
 
     table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), index=False)
 
-    git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
+    #git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
     repo.close()
 
     # We return the difference of the countries between yesterday and today so they can be added

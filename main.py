@@ -11,7 +11,6 @@ import logging
 import os
 import sys
 import traceback
-import errno
 import stat
 import shutil
 
@@ -26,14 +25,14 @@ def check_link(http: str):
     r = requests.get(http)
     # The situation reports are produced at different times so poll
     # for the report until it is produced and uploaded!
-    if r.status_code is not 200:
+    if r.status_code != 200:
         for i in range(48):
             time.sleep(1800)
             r = requests.get(http)
-            if r.status_code is 200:
+            if r.status_code == 200:
                 break
 
-    if r.status_code is not 200:
+    if r.status_code != 200:
         mail('FAILURE: Received {}'.format(r.status_code),
              'Failed to connect, received {}'.format(r.status_code) +
              '\nNo file will be uploaded, please retrieve the information'
@@ -100,7 +99,7 @@ if __name__ == '__main__':
     if args.token is None:
         raise ValueError('A Github Token is required!!!')
 
-    if args.date is 'None':
+    if args.date == 'None':
         scrape_date = datetime.now(pytz.timezone('CET')).date()
     else:
         scrape_date = date(
@@ -119,7 +118,7 @@ if __name__ == '__main__':
             countries['old_countries'] = 'None'
         mail(
             '{} Success!'.format(scrape_date.strftime('%d%m%Y')),
-            'The situation report for {}'.format(scrape_date.strftime('%d%m%Y')) +
+            'The situation report for {} '.format(scrape_date.strftime('%d%m%Y')) +
             'Was successfully scraped and uploaded. Please review the attached logs!'
             '\n\nThe following are potentially missing or erroneous entries:'
             '\nNew Country names found:\n\t{}'.format(countries['new_countries']) +
@@ -142,6 +141,6 @@ if __name__ == '__main__':
         print(msg)
     finally:
         # Cleanup:
-        shutil.rmtree('who', ignore_errors=False, onerror=remove_readonly)
+        shutil.rmtree(scrape_date.strftime('%d%m%Y'), ignore_errors=False, onerror=remove_readonly)
         logging.shutdown()
         os.remove('.log')
