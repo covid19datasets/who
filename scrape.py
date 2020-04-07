@@ -179,11 +179,10 @@ def scrape(http, branch, scrape_date, git_access_token):
 
     # We read the old table and take note of any significant changes.
     # These changes are logged and sent as an email.
-    previous_historic = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), header=0)
-    previous_today = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'today.csv'), header=0)
-
-    old_countries = set(previous_today['Country/Region']) - set(table['Country/Region'])
-    new_countries = set(table['Country/Region']) - set(previous_today['Country/Region'])
+    historic = pd.read_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), header=0)
+    
+    old_countries = set(historic['Country/Region']) - set(table['Country/Region'])
+    new_countries = set(table['Country/Region']) - set(historic['Country/Region'])
 
     # We add the dates to the table:
     table = append_dates(table, scrape_date)
@@ -193,7 +192,7 @@ def scrape(http, branch, scrape_date, git_access_token):
     table.to_csv('today.csv', index=False)
 
     # We concatenate the new table onto the old one and save it:
-    table = pd.concat([previous_historic, table])
+    table = pd.concat([historic, table])
 
     table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), index=False)
 

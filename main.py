@@ -31,19 +31,19 @@ def check_link(http: str, http_mp: str):
     if r_mp.status_code == 200:
         return http_mp
 
-    for i in range(48):
+    for i in range(1440):
         r = requests.get(http)
         r_mp = requests.get(http_mp)
         if r.status_code == 200:
             return http
         if r_mp.status_code == 200:
-            return http
-        time.sleep(1800)
+            return http_mp
+        time.sleep(60)
 
     if r.status_code == 200:
         return http
     if r_mp.status_code == 200:
-        return http
+        return http_mp
 
     mail('FAILURE: Received {}'.format(r.status_code),
          'Failed to connect, received {}'.format(r.status_code) +
