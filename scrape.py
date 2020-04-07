@@ -194,7 +194,7 @@ def scrape(http, branch, scrape_date, git_access_token):
 
     table.to_csv(os.path.join(scrape_date.strftime('%d%m%Y'), 'who', 'historic.csv'), index=False)
 
-    #git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
+    git_push(scrape_date=scrape_date.strftime('%d%m%Y'))
     repo.close()
 
     # We return the difference of the countries between yesterday and today so they can be added
